@@ -1,0 +1,43 @@
+{
+  "extends": [
+    "plugin:fp/recommended"
+  ],
+  "env": {
+    "es6": true
+  },
+  "plugins": [
+    "fp",
+    "better"
+  ],
+  "rules": {
+    "fp/no-rest-parameters": 0,
+    "fp/no-mutation": [
+      "error",
+      {
+        "commonjs": true
+      }
+    ],
+    "better/no-ifs": 2,
+    "better/no-instanceofs": 2,
+    "better/no-new": 2,
+    "better/explicit-return": 2,
+    "better/no-classes": 0,
+    "better/no-deletes": 0,
+    "better/no-exceptions": 0,
+    "better/no-exports": 0,
+    "better/no-fors": 0,
+    "better/no-function-expressions": 0,
+    "better/no-imports": 0,
+    "better/no-nulls": 0,
+    "better/no-reassigns": 0,
+    "better/no-switches": 0,
+    "better/no-this": 0,
+    "better/no-typeof": 0,
+    "better/no-undefined": 0,
+    "better/no-variable-declaration": 0,
+    "better/no-whiles": 0,
+    "no-var": 2,
+    "prefer-spread": 2,
+    "prefer-rest-params": 2
+  }
+}
