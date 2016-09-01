@@ -56,3 +56,73 @@ test('Game.check()', (assert) => {
 
   assert.end();
 });
+
+test('Game.winner()', (assert) => {
+  assert.same(
+    Game.winner(Game()),
+    '_',
+    'should not return a winner'
+  );
+
+  assert.same(
+    Game.winner({
+      grid: [
+        ['x', 'x', 'x'],
+        ['o', '_', '_'],
+        ['o', '_', '_']
+      ]
+    }),
+    'x',
+    'should return x as horizontal winner'
+  );
+
+  assert.same(
+    Game.winner({
+      grid: [
+        ['x', '_', '_'],
+        ['o', 'o', 'o'],
+        ['x', '_', '_']
+      ]
+    }),
+    'o',
+    'should return o as horizontal winner'
+  );
+
+  assert.same(
+    Game.winner({
+      grid: [
+        ['x', '_', 'o'],
+        ['x', '_', 'o'],
+        ['x', '_', '_']
+      ]
+    }),
+    'x',
+    'should return x as vertical winner'
+  );
+
+  assert.same(
+    Game.winner({
+      grid: [
+        ['o', '_', '_'],
+        ['x', 'o', '_'],
+        ['x', '_', 'o']
+      ]
+    }),
+    'o',
+    'should return o as diagonal winner'
+  );
+
+  assert.same(
+    Game.winner({
+      grid: [
+        ['o', '_', 'x'],
+        ['_', 'x', '_'],
+        ['x', '_', 'o']
+      ]
+    }),
+    'x',
+    'should return x as diagonal winner'
+  );
+
+  assert.end();
+});
