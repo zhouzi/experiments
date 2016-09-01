@@ -36,78 +36,6 @@ const check = (game, x, y) => (
  * @param {Array} grid
  * @param {number} x
  * @param {number} y
- * @param value
- * @returns {Array}
- */
-const updateCell = (grid, x, y, value) => (
-  updateAtIndex(
-    grid,
-    x,
-    (row) => updateAtIndex(
-      row,
-      y,
-      () => value
-    )
-  )
-);
-
-/**
- * @param {Game} game
- * @param {number} x
- * @param {number} y
- * @returns {Game}
- */
-const checkAtCoord = (game, x, y) => (
-  updateGame(
-    game,
-    {
-      player: getNextPlayer(game.player),
-      grid: updateCell(game.grid, x, y, game.player)
-    }
-  )
-);
-
-/**
- * @param {Player} player
- * @returns {Player}
- */
-const getNextPlayer = (player) => (
-  player === 'x'
-    ? 'o'
-    : 'x'
-);
-
-/**
- * @param {Game} game
- * @param {object} newProps
- * @returns {Game}
- */
-const updateGame = (game, newProps) => (
-  Object.assign(
-    {},
-    game,
-    newProps
-  )
-);
-
-/**
- * @param {Array} items
- * @param {number} index
- * @param {function} valueGetter
- * @returns {Array}
- */
-const updateAtIndex = (items, index, valueGetter) => (
-  items.map((item, itemIndex) =>
-    itemIndex === index
-      ? valueGetter(item)
-      : item
-  )
-);
-
-/**
- * @param {Array} grid
- * @param {number} x
- * @param {number} y
  * @returns {boolean}
  */
 const isCheckable = (grid, x, y) => (
@@ -132,6 +60,78 @@ const isInRange = (grid, x, y) => (
  */
 const isFree = (grid, x, y) => (
   grid[x] == null || grid[x][y] === '_'
+);
+
+/**
+ * @param {Game} game
+ * @param {number} x
+ * @param {number} y
+ * @returns {Game}
+ */
+const checkAtCoord = (game, x, y) => (
+  updateGame(
+    game,
+    {
+      player: getNextPlayer(game.player),
+      grid: updateCell(game.grid, x, y, game.player)
+    }
+  )
+);
+
+/**
+ * @param {Game} game
+ * @param {object} newProps
+ * @returns {Game}
+ */
+const updateGame = (game, newProps) => (
+  Object.assign(
+    {},
+    game,
+    newProps
+  )
+);
+
+/**
+ * @param {Player} player
+ * @returns {Player}
+ */
+const getNextPlayer = (player) => (
+  player === 'x'
+    ? 'o'
+    : 'x'
+);
+
+/**
+ * @param {Array} grid
+ * @param {number} x
+ * @param {number} y
+ * @param value
+ * @returns {Array}
+ */
+const updateCell = (grid, x, y, value) => (
+  updateAtIndex(
+    grid,
+    x,
+    (row) => updateAtIndex(
+      row,
+      y,
+      () => value
+    )
+  )
+);
+
+/**
+ * @param {Array} items
+ * @param {number} index
+ * @param {function} valueGetter
+ * @returns {Array}
+ */
+const updateAtIndex = (items, index, valueGetter) => (
+  items.map((item, itemIndex) =>
+    itemIndex === index
+      ? valueGetter(item)
+      : item
+  )
 );
 
 /**
