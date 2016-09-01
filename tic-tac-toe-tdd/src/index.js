@@ -32,7 +32,15 @@ const check = (game, x, y) => (
       game,
       {
         player: getNextPlayer(game.player),
-        grid: game.grid.map(getRowValue(x, y, game.player))
+        grid: updateAtIndex(
+          game.grid,
+          x,
+          (row) => updateAtIndex(
+            row,
+            y,
+            () => game.player
+          )
+        )
       }
     )
     : game
@@ -62,31 +70,18 @@ const updateGame = (game, newProps) => (
 );
 
 /**
- * @param {number} x
- * @param {number} y
- * @param {string} cellValue
- * @returns {function}
+ * @param {Array} items
+ * @param {number} index
+ * @param {function} valueGetter
+ * @returns {Array}
  */
-const getRowValue =
-  (x, y, cellValue) =>
-    (row, rowIndex) => (
-      rowIndex === x
-        ? row.map(getCellValue(y, cellValue))
-        : row
-    );
-
-/**
- * @param {number} y
- * @param {string} cellValue
- * @returns {function}
- */
-const getCellValue =
-  (y, cellValue) =>
-    (cell, cellIndex) => (
-      cellIndex === y
-        ? cellValue
-        : cell
-    );
+const updateAtIndex = (items, index, valueGetter) => (
+  items.map((item, itemIndex) =>
+    itemIndex === index
+      ? valueGetter(item)
+      : item
+  )
+);
 
 /**
  * @param {Array} grid
