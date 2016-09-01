@@ -257,7 +257,7 @@ const getCellAt = (grid, x, y) => (
  * @returns {Array}
  */
 const times = (size, iteratee) => (
-  timesRecursive(size, iteratee, 0, [])
+  timesRecursive(size, iteratee)
 );
 
 /**
@@ -267,7 +267,7 @@ const times = (size, iteratee) => (
  * @param {Array} acc
  * @returns {Array}
  */
-const timesRecursive = (size, iteratee, index, acc) => (
+const timesRecursive = (size, iteratee, index = 0, acc = []) => (
   size === 0
     ? acc
     : timesRecursive(
