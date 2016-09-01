@@ -28,22 +28,43 @@ const createGame = () => ({
  */
 const check = (game, x, y) => (
   isCheckable(game.grid, x, y)
-    ? updateGame(
-      game,
-      {
-        player: getNextPlayer(game.player),
-        grid: updateAtIndex(
-          game.grid,
-          x,
-          (row) => updateAtIndex(
-            row,
-            y,
-            () => game.player
-          )
-        )
-      }
-    )
+    ? checkAtCoord(game, x, y)
     : game
+);
+
+/**
+ * @param {Array} grid
+ * @param {number} x
+ * @param {number} y
+ * @param value
+ * @returns {Array}
+ */
+const updateCell = (grid, x, y, value) => (
+  updateAtIndex(
+    grid,
+    x,
+    (row) => updateAtIndex(
+      row,
+      y,
+      () => value
+    )
+  )
+);
+
+/**
+ * @param {Game} game
+ * @param {number} x
+ * @param {number} y
+ * @returns {Game}
+ */
+const checkAtCoord = (game, x, y) => (
+  updateGame(
+    game,
+    {
+      player: getNextPlayer(game.player),
+      grid: updateCell(game.grid, x, y, game.player)
+    }
+  )
 );
 
 /**
