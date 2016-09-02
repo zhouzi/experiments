@@ -197,20 +197,20 @@ const getWinnerFromCollectionsOfCoords = (grid, collectionsOfCoords) => (
  * @param {function} iteratee
  * @returns {string}
  */
-const lookupWinner = (ar, iteratee) => {
-  if (ar.length === 0) {
-    return '_';
-  }
+const lookupWinner = (ar, iteratee) => (
+  ar.length === 0
+    ? '_'
+    : (() => {
+      const head = ar[0];
+      const result = iteratee(head);
 
-  const head = ar[0];
-  const result = iteratee(head);
-
-  return (
-    result === '_'
-      ? lookupWinner(ar.slice(1), iteratee)
-      : result
-  );
-};
+      return (
+        result === '_'
+          ? lookupWinner(ar.slice(1), iteratee)
+          : result
+      );
+    })()
+);
 
 /**
  * @param {Array} grid
