@@ -127,11 +127,10 @@ const updateCell = (grid, x, y, value) => (
  * @returns {Array}
  */
 const updateAtIndex = (items, index, valueGetter) => (
-  items.map((item, itemIndex) =>
-    itemIndex === index
-      ? valueGetter(item)
-      : item
-  )
+  items
+    .slice(0, index)
+    .concat([valueGetter(items[index])])
+    .concat(items.slice(index + 1))
 );
 
 /**
