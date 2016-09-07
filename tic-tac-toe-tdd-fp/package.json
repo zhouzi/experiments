@@ -2,8 +2,11 @@
   "private": true,
   "scripts": {
     "lint": "eslint **/*.js",
-    "test": "node src/__test__/index.js",
-    "dev": "nodemon src/__test__/index.js"
+    "watch:test:game": "nodemon src/__test__/index.js",
+    "test:game": "node src/__test__/index.js",
+    "watch:test:dom": "nodemon src/__test__/DOM.js",
+    "test:dom": "node src/__test__/DOM.js",
+    "test": "npm run test:game && npm run test:DOM"
   },
   "engines": {
     "node": "6.5.0"
@@ -12,6 +15,7 @@
     "eslint": "3.4.0",
     "eslint-plugin-better": "0.1.5",
     "eslint-plugin-fp": "2.2.0",
+    "jsdom": "9.5.0",
     "nodemon": "1.10.2",
     "tape": "4.6.0"
   }
