@@ -9,9 +9,39 @@ jsdom.env(
 
     test('createView()', (assert) => {
       assert.same(
-        createView().tagName,
+        createView({
+          grid: [
+            ['_', '_', '_'],
+            ['_', '_', '_'],
+            ['_', '_', '_']
+          ]
+        }).tagName,
         'TABLE',
         'should create a container'
+      );
+
+      assert.same(
+        createView({
+          grid: [
+            ['_', '_', '_'],
+            ['_', '_', '_'],
+            ['_', '_', '_']
+          ]
+        }).innerHTML,
+        '<tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr><tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr><tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr>',
+        'should create the grid'
+      );
+
+      assert.same(
+        createView({
+          grid: [
+            ['x', '_', '_'],
+            ['_', '_', 'o'],
+            ['_', '_', '_']
+          ]
+        }).innerHTML,
+        '<tr><td><button type="button" disabled="true">x</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr><tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button" disabled="true">o</button></td></tr><tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr>',
+        'should handle checked cells'
       );
 
       assert.end();
