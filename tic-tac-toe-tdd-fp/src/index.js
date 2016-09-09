@@ -59,7 +59,7 @@ const isInRange = (grid, x, y) => (
  * @returns {boolean}
  */
 const isFree = (grid, x, y) => (
-  grid[x] == null || grid[x][y] === '_'
+  grid[y] == null || grid[y][x] === '_'
 );
 
 /**
@@ -111,10 +111,10 @@ const getNextPlayer = (player) => (
 const updateCell = (grid, x, y, value) => (
   updateAtIndex(
     grid,
-    x,
+    y,
     (row) => updateAtIndex(
       row,
-      y,
+      x,
       () => value
     )
   )

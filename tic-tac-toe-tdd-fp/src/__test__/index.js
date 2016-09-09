@@ -25,9 +25,19 @@ test('Game.check()', (assert) => {
   assert.same(
     Game.check(Game(), 0, 1).grid,
     [
-      ['_', 'x', '_'],
       ['_', '_', '_'],
+      ['x', '_', '_'],
       ['_', '_', '_']
+    ],
+    'should check target cell'
+  );
+
+  assert.same(
+    Game.check(Game(), 1, 2).grid,
+    [
+      ['_', '_', '_'],
+      ['_', '_', '_'],
+      ['_', 'x', '_']
     ],
     'should check target cell'
   );
@@ -35,8 +45,8 @@ test('Game.check()', (assert) => {
   assert.same(
     Game.check(Game.check(Game(), 0, 1), 0, 0).grid,
     [
-      ['o', 'x', '_'],
-      ['_', '_', '_'],
+      ['o', '_', '_'],
+      ['x', '_', '_'],
       ['_', '_', '_']
     ],
     'should check target cell for the other player'
