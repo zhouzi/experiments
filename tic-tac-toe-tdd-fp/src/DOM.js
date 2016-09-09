@@ -1,31 +1,4 @@
 /**
- * @param {string} content
- * @returns {Element}
- */
-const createButton = (content) => (
-  createElement('button', content, {
-    type: 'button',
-    disabled: content !== '_'
-  })
-);
-
-/**
- * @param {string} cell
- * @returns {Element}
- */
-const createCell = (cell) => (
-  createElement('td', createButton(cell))
-);
-
-/**
- * @param {Array} row
- * @returns {Element}
- */
-const createRow = (row) => (
-  createElement('tr', row.map((cell) => createCell(cell)))
-);
-
-/**
  * @param {Element} element
  * @param {Array} children
  * @returns {Element}
@@ -54,14 +27,18 @@ const addAttrs = (element, attrs) => {
   Object
     .keys(attrs)
     .filter((attr) => attrs[attr])
-    .forEach((attr) => element.setAttribute(attr, attrs[attr]));
+    .forEach((attr) => (
+      attr.substr(0, 2) == 'on'
+        ? element.addEventListener(attr.substr(2).toLowerCase(), attrs[attr])
+        : element.setAttribute(attr, attrs[attr])
+    ));
 
   return element;
 };
 
 /**
  * @param {string} tagName
- * @param {Array|string} children
+ * @param {Array|Element|string} children
  * @param {object} attrs
  * @returns {Element}
  */
@@ -79,10 +56,43 @@ const createElement = (tagName, children, attrs = {}) => {
 
 /**
  * @param {Game} game
+ * @param {function} callback
  * @returns {Element}
  */
-const createView = (game) => (
-  createElement('table', game.grid.map((row) => createRow(row)))
-);
+const createView = (game, callback) => {
+  /**
+   * @param {string} content
+   * @param {function} onClick
+   * @returns {Element}
+   */
+  const createButton = (content, onClick) => (
+    createElement('button', content, {
+      type: 'button',
+      disabled: content !== '_',
+      onClick
+    })
+  );
+
+  /**
+   * @param {string} cell
+   * @param {number} x
+   * @param {number} y
+   * @returns {Element}
+   */
+  const createCell = (cell, x, y) => (
+    createElement('td', createButton(cell, () => callback(x, y)))
+  );
+
+  /**
+   * @param {Array} row
+   * @param {number} y
+   * @returns {Element}
+   */
+  const createRow = (row, y) => (
+    createElement('tr', row.map((cell, x) => createCell(cell, x, y)))
+  );
+
+  return createElement('table', game.grid.map((row, y) => createRow(row, y)));
+};
 
 module.exports = createView;

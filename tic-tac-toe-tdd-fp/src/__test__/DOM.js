@@ -30,7 +30,7 @@ jsdom.env(
             ['_', '_', '_'],
             ['_', '_', '_']
           ]
-        }).innerHTML,
+        }, () => {}).innerHTML,
         '<tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr><tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr><tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr>'
       );
 
@@ -45,8 +45,32 @@ jsdom.env(
             ['_', '_', 'o'],
             ['_', '_', '_']
           ]
-        }).innerHTML,
+        }, () => {}).innerHTML,
         '<tr><td><button type="button" disabled="true">x</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr><tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button" disabled="true">o</button></td></tr><tr><td><button type="button">_</button></td><td><button type="button">_</button></td><td><button type="button">_</button></td></tr>'
+      );
+
+      assert.end();
+    });
+
+    test('should call callback with coords', (assert) => {
+      let args;
+      const callback = (...rest) => args = rest;
+      const view = createView({
+        grid: [
+          ['_', '_', '_'],
+          ['_', '_', '_'],
+          ['_', '_', '_']
+        ]
+      }, callback);
+
+      view.querySelector('tr:nth-child(2)>td:nth-child(3) button').click();
+
+      assert.same(
+        args,
+        [
+          2,
+          1
+        ]
       );
 
       assert.end();
