@@ -136,3 +136,31 @@ test('Game.winner()', (assert) => {
 
   assert.end();
 });
+
+test('Game.gameover()', (assert) => {
+  assert.same(
+    Game.gameover({
+      grid: [
+        ['_', '_', '_'],
+        ['_', '_', '_'],
+        ['_', '_', '_']
+      ]
+    }),
+    false,
+    'should return false'
+  );
+
+  assert.same(
+    Game.gameover({
+      grid: [
+        ['x', 'o', 'x'],
+        ['o', 'x', 'o'],
+        ['x', 'o', 'x']
+      ]
+    }),
+    true,
+    'should return true'
+  );
+
+  assert.end();
+});

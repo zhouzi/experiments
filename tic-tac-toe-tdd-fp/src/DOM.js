@@ -1,3 +1,5 @@
+const Game = require('./');
+
 /**
  * @param {Element} element
  * @param {Array} children
@@ -55,11 +57,48 @@ const createElement = (tagName, children, attrs = {}) => {
 };
 
 /**
+ * @param {string} type
+ * @param {*} payload
+ * @returns {object}
+ */
+const createAction = (type, payload) => {
+  const action = {
+    type
+  };
+
+  if (payload != null) {
+    action.payload = payload;
+  }
+
+  return action;
+};
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @returns {object}
+ */
+const checkAction = (x, y) => (
+  createAction('check', [x, y])
+);
+
+/**
+ * @returns {object}
+ */
+const gameoverAction = () => (
+  createAction('gameover')
+);
+
+/**
  * @param {Game} game
  * @param {function} callback
  * @returns {Element}
  */
 const createView = (game, callback) => {
+  if (Game.gameover(game)) {
+    callback(gameoverAction());
+  }
+
   /**
    * @param {string} content
    * @param {function} onClick
@@ -80,7 +119,7 @@ const createView = (game, callback) => {
    * @returns {Element}
    */
   const createCell = (cell, x, y) => (
-    createElement('td', createButton(cell, () => callback(x, y)))
+    createElement('td', createButton(cell, () => callback(checkAction(x, y))))
   );
 
   /**

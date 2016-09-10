@@ -68,8 +68,38 @@ jsdom.env(
       assert.same(
         args,
         [
-          2,
-          1
+          {
+            type: 'check',
+            payload: [
+              2,
+              1
+            ]
+          }
+        ]
+      );
+
+      assert.end();
+    });
+
+    test('should call a callback when game is over', (assert) => {
+      let args;
+      const callback = (...rest) => args = rest;
+      const view = createView({
+        grid: [
+          ['x', 'o', 'x'],
+          ['o', 'x', 'o'],
+          ['x', 'o', 'x']
+        ]
+      }, callback);
+
+      view.querySelector('tr:nth-child(3)>td:nth-child(2) button').click();
+
+      assert.same(
+        args,
+        [
+          {
+            type: 'gameover'
+          }
         ]
       );
 

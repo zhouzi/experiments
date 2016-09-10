@@ -277,6 +277,17 @@ const timesRecursive = (size, iteratee, index = 0, acc = []) => (
     )
 );
 
+/**
+ * @param {Game} game
+ * @returns {boolean}
+ */
+const gameover = (game) => (
+  !game.grid.some((row) => (
+    row.some((cell) => cell == '_')
+  ))
+);
+
 module.exports = createGame;
 module.exports.check = check;
 module.exports.winner = winner;
+module.exports.gameover = gameover;
