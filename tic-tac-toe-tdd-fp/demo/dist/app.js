@@ -51,17 +51,23 @@
 	const generate = (game = Game()) => {
 	  app.innerHTML = '';
 	  app.appendChild(
-	    createView(game, (x, y) => {
-	      game = Game.check(game, x, y);
-	      const winner = Game.winner(game);
+	    createView(game, (action) => {
+	      switch (action.type) {
+	        case 'winner':
+	          alert(`Winner is ${action.payload}!`);
+	          setTimeout(() => generate(), 0);
+	          return;
 
-	      if (winner == '_') {
-	        generate(game);
-	        return;
+	        case 'gameover':
+	          alert(`Game Over!`);
+	          setTimeout(() => generate(), 0);
+	          return;
+
+	        case 'check':
+	          const [x, y] = action.payload;
+	          generate(Game.check(game, x, y));
+	          return;
 	      }
-
-	      alert(`Winner is ${winner}!`);
-	      generate();
 	    })
 	  );
 	};
@@ -352,14 +358,27 @@
 	    )
 	);
 
+	/**
+	 * @param {Game} game
+	 * @returns {boolean}
+	 */
+	const gameover = (game) => (
+	  !game.grid.some((row) => (
+	    row.some((cell) => cell == '_')
+	  ))
+	);
+
 	module.exports = createGame;
 	module.exports.check = check;
 	module.exports.winner = winner;
+	module.exports.gameover = gameover;
 
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	const Game = __webpack_require__(1);
 
 	/**
 	 * @param {Element} element
@@ -418,11 +437,62 @@
 	};
 
 	/**
+	 * @param {string} type
+	 * @param {*} payload
+	 * @returns {object}
+	 */
+	const createAction = (type, payload) => {
+	  const action = {
+	    type
+	  };
+
+	  if (payload != null) {
+	    action.payload = payload;
+	  }
+
+	  return action;
+	};
+
+	/**
+	 * @param {number} x
+	 * @param {number} y
+	 * @returns {object}
+	 */
+	const checkAction = (x, y) => (
+	  createAction('check', [x, y])
+	);
+
+	/**
+	 * @returns {object}
+	 */
+	const gameoverAction = () => (
+	  createAction('gameover')
+	);
+
+	/**
+	 * @param {string} winner
+	 * @returns {object}
+	 */
+	const winnerAction = (winner) => ({
+	  type: 'winner',
+	  payload: winner
+	});
+
+	/**
 	 * @param {Game} game
-	 * @param {function} callback
+	 * @param {function} dispatch
 	 * @returns {Element}
 	 */
-	const createView = (game, callback) => {
+	const createView = (game, dispatch) => {
+	  const winner = Game.winner(game);
+	  if (winner !== '_') {
+	    dispatch(winnerAction(winner));
+	  }
+
+	  if (Game.gameover(game)) {
+	    dispatch(gameoverAction());
+	  }
+
 	  /**
 	   * @param {string} content
 	   * @param {function} onClick
@@ -443,7 +513,7 @@
 	   * @returns {Element}
 	   */
 	  const createCell = (cell, x, y) => (
-	    createElement('td', createButton(cell, () => callback(x, y)))
+	    createElement('td', createButton(cell, () => dispatch(checkAction(x, y))))
 	  );
 
 	  /**

@@ -90,13 +90,27 @@ const gameoverAction = () => (
 );
 
 /**
+ * @param {string} winner
+ * @returns {object}
+ */
+const winnerAction = (winner) => ({
+  type: 'winner',
+  payload: winner
+});
+
+/**
  * @param {Game} game
- * @param {function} callback
+ * @param {function} dispatch
  * @returns {Element}
  */
-const createView = (game, callback) => {
+const createView = (game, dispatch) => {
+  const winner = Game.winner(game);
+  if (winner !== '_') {
+    dispatch(winnerAction(winner));
+  }
+
   if (Game.gameover(game)) {
-    callback(gameoverAction());
+    dispatch(gameoverAction());
   }
 
   /**
@@ -119,7 +133,7 @@ const createView = (game, callback) => {
    * @returns {Element}
    */
   const createCell = (cell, x, y) => (
-    createElement('td', createButton(cell, () => callback(checkAction(x, y))))
+    createElement('td', createButton(cell, () => dispatch(checkAction(x, y))))
   );
 
   /**

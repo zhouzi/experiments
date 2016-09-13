@@ -86,19 +86,41 @@ jsdom.env(
       const callback = (...rest) => args = rest;
       const view = createView({
         grid: [
-          ['x', 'o', 'x'],
-          ['o', 'x', 'o'],
+          ['x', 'x', 'o'],
+          ['o', 'o', 'x'],
           ['x', 'o', 'x']
         ]
       }, callback);
-
-      view.querySelector('tr:nth-child(3)>td:nth-child(2) button').click();
 
       assert.same(
         args,
         [
           {
             type: 'gameover'
+          }
+        ]
+      );
+
+      assert.end();
+    });
+
+    test('should call a callback when a player wins', (assert) => {
+      let args;
+      const callback = (...rest) => args = rest;
+      const view = createView({
+        grid: [
+          ['x', '_', '_'],
+          ['o', 'x', '_'],
+          ['o', '_', 'x']
+        ]
+      }, callback);
+
+      assert.same(
+        args,
+        [
+          {
+            type: 'winner',
+            payload: 'x'
           }
         ]
       );

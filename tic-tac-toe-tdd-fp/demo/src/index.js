@@ -5,17 +5,23 @@ const app = document.getElementById('app');
 const generate = (game = Game()) => {
   app.innerHTML = '';
   app.appendChild(
-    createView(game, (x, y) => {
-      game = Game.check(game, x, y);
-      const winner = Game.winner(game);
+    createView(game, (action) => {
+      switch (action.type) {
+        case 'winner':
+          alert(`Winner is ${action.payload}!`);
+          setTimeout(() => generate(), 0);
+          return;
 
-      if (winner == '_') {
-        generate(game);
-        return;
+        case 'gameover':
+          alert(`Game Over!`);
+          setTimeout(() => generate(), 0);
+          return;
+
+        case 'check':
+          const [x, y] = action.payload;
+          generate(Game.check(game, x, y));
+          return;
       }
-
-      alert(`Winner is ${winner}!`);
-      generate();
     })
   );
 };
