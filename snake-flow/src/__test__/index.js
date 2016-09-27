@@ -1,19 +1,6 @@
 const test = require('ava');
 const { createGame, tick, direction, grow } = require('../index');
 
-test('it should create a game', (assert) => {
-  const actual = createGame();
-  const expected = {
-    direction: 'right',
-    bounds: [10, 10],
-    snake: [
-      [0, 0],
-    ],
-    food: [],
-  };
-  assert.deepEqual(actual, expected);
-});
-
 test('should move the snake to the right', (assert) => {
   const actual = tick(createGame()).snake;
   const expected = [
@@ -88,4 +75,21 @@ test('should move a big snake', (assert) => {
     [1, 0],
   ];
   assert.deepEqual(actual, expected);
+});
+
+test('should add some food', (assert) => {
+  const actual = createGame().food.length;
+  const expected = 1;
+  assert.is(actual, expected);
+});
+
+test('should randomly add food', (assert) => {
+  let foods = [];
+  for (let i = 0; i < 10; i++) {
+    foods = foods.concat(createGame().food);
+  }
+  const isSamePoint = ([x1, y1]) => ([x2, y2]) => x1 === x2 && y1 === y2;
+  const isUnique = food => foods.filter(isSamePoint(food)).length === 1;
+  const hasUniqueFood = foods.some(isUnique);
+  assert.is(hasUniqueFood, true);
 });

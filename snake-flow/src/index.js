@@ -10,14 +10,23 @@ type Game = {
   food: Coords
 };
 
+function random(min: number, max: number): number {
+  return Math.floor(Math.random() * ((max - min) + 1)) + min;
+}
+
 function createGame(): Game {
+  const maxX = 10;
+  const maxY = 10;
+
   return {
     direction: 'right',
-    bounds: [10, 10],
+    bounds: [maxX, maxY],
     snake: [
       [0, 0],
     ],
-    food: [],
+    food: [
+      [random(0, maxX), random(0, maxY)],
+    ],
   };
 }
 
