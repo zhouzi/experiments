@@ -79,29 +79,36 @@ function movePoint(previousPoint: Point, dir: Direction, bounds: Point, factor: 
   return createPointWithinBounds(point, bounds);
 }
 
-function tick(game: Game): Game {
-  const head = game.snake[0];
-  const tail = game.snake.slice(0, -1);
-  const point = movePoint(head, game.direction, game.bounds, 1);
-  const snake = [point].concat(tail);
-
-  return Object.assign({}, game, {
-    snake,
-  });
-}
-
-function direction(game: Game, dir: Direction): Game {
-  return Object.assign({}, game, {
-    direction: dir,
-  });
-}
-
 function grow(game: Game): Game {
   const lastPoint = game.snake[game.snake.length - 1];
   const point = movePoint(lastPoint, game.direction, game.bounds, -1);
 
   return Object.assign({}, game, {
     snake: game.snake.concat([point]),
+  });
+}
+
+function tick(game: Game): Game {
+  const head = game.snake[0];
+  const tail = game.snake.slice(0, -1);
+  const point = movePoint(head, game.direction, game.bounds, 1);
+  const snake = [point].concat(tail);
+  const resultingGame = Object.assign({}, game, {
+    snake,
+  });
+
+  // Not really elegant and won't work
+  // if there's more than one food item
+  if (resultingGame.food[0][0] === point[0] && resultingGame.food[0][1] === point[1]) {
+    return grow(resultingGame);
+  }
+
+  return resultingGame;
+}
+
+function direction(game: Game, dir: Direction): Game {
+  return Object.assign({}, game, {
+    direction: dir,
   });
 }
 

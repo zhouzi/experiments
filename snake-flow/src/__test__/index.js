@@ -93,3 +93,20 @@ test('should randomly add food', (assert) => {
   const hasUniqueFood = foods.some(isUnique);
   assert.is(hasUniqueFood, true);
 });
+
+test('should grow when eating food', (assert) => {
+  const game = createGame();
+  game.food = [
+    [1, 0],
+  ];
+  const actual = tick(game).snake;
+  const expected = [
+    [1, 0],
+    [0, 0],
+  ];
+  assert.deepEqual(actual, expected);
+});
+
+test.todo('should generate new food when one is eaten');
+test.todo('should not generate food over the snake');
+test.todo('should end the game when the snake eats itself');
