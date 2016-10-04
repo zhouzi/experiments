@@ -14,10 +14,14 @@ function random(min: number, max: number): number {
   return Math.floor(Math.random() * ((max - min) + 1)) + min;
 }
 
+function updateGame(game: Game, props: Object): Game {
+  return Object.assign({}, game, props);
+}
+
 function placeFood(game: Game): Game {
   const [maxX, maxY] = game.bounds;
 
-  return Object.assign({}, game, {
+  return updateGame(game, {
     food: game.food.concat([
       [random(0, maxX), random(0, maxY)],
     ]),
@@ -88,7 +92,7 @@ function grow(game: Game): Game {
   const lastPoint = game.snake[game.snake.length - 1];
   const point = movePoint(lastPoint, game.direction, game.bounds, -1);
 
-  return Object.assign({}, game, {
+  return updateGame(game, {
     snake: game.snake.concat([point]),
   });
 }
@@ -98,14 +102,14 @@ function tick(game: Game): Game {
   const tail = game.snake.slice(0, -1);
   const point = movePoint(head, game.direction, game.bounds, 1);
   const snake = [point].concat(tail);
-  const resultingGame = Object.assign({}, game, {
+  const resultingGame = updateGame(game, {
     snake,
   });
 
   // Not really elegant and won't work
   // if there's more than one food item
   if (resultingGame.food[0][0] === point[0] && resultingGame.food[0][1] === point[1]) {
-    return placeFood(grow(Object.assign({}, resultingGame, {
+    return placeFood(grow(updateGame(resultingGame, {
       food: [],
     })));
   }
@@ -114,7 +118,7 @@ function tick(game: Game): Game {
 }
 
 function direction(game: Game, dir: Direction): Game {
-  return Object.assign({}, game, {
+  return updateGame(game, {
     direction: dir,
   });
 }
