@@ -14,20 +14,25 @@ function random(min: number, max: number): number {
   return Math.floor(Math.random() * ((max - min) + 1)) + min;
 }
 
-function createGame(): Game {
-  const maxX = 10;
-  const maxY = 10;
+function placeFood(game: Game): Game {
+  const [maxX, maxY] = game.bounds;
 
-  return {
+  return Object.assign({}, game, {
+    food: game.food.concat([
+      [random(0, maxX), random(0, maxY)],
+    ]),
+  });
+}
+
+function createGame(): Game {
+  return placeFood({
     direction: 'right',
-    bounds: [maxX, maxY],
+    bounds: [10, 10],
     snake: [
       [0, 0],
     ],
-    food: [
-      [random(0, maxX), random(0, maxY)],
-    ],
-  };
+    food: [],
+  });
 }
 
 function withinBounds(n: number, min: number, max: number): number {
@@ -100,7 +105,9 @@ function tick(game: Game): Game {
   // Not really elegant and won't work
   // if there's more than one food item
   if (resultingGame.food[0][0] === point[0] && resultingGame.food[0][1] === point[1]) {
-    return grow(resultingGame);
+    return placeFood(grow(Object.assign({}, resultingGame, {
+      food: [],
+    })));
   }
 
   return resultingGame;

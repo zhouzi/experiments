@@ -107,6 +107,18 @@ test('should grow when eating food', (assert) => {
   assert.deepEqual(actual, expected);
 });
 
-test.todo('should generate new food when one is eaten');
+test('should generate new food when one is eaten', (assert) => {
+  const game = createGame();
+  game.food = [
+    [1, 0],
+  ];
+  const actual = tick(game).food;
+  const unexpected = [
+    [1, 0],
+  ];
+  assert.is(actual.length, 1);
+  assert.notDeepEqual(actual, unexpected);
+});
+
 test.todo('should not generate food over the snake');
 test.todo('should end the game when the snake eats itself');
