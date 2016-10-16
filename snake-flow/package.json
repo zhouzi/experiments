@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "types": "flow",
-    "lint": "eslint **/*.js",
+    "lint": "eslint '**/*.js'",
     "test": "ava src/__test__/*.js",
     "test:watch": "ava src/__test__/*.js --watch",
     "check": "npm run types ; npm run lint ; npm run test"
