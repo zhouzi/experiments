@@ -5,8 +5,7 @@
     "lint": "eslint **/*.js",
     "test": "ava src/__test__/*.js",
     "test:watch": "ava src/__test__/*.js --watch",
-    "check": "npm run types ; npm run lint ; npm run test",
-    "build": "babel src/index.js -o dist/index.js"
+    "check": "npm run types ; npm run lint ; npm run test"
   },
   "ava": {
     "require": "babel-register",
@@ -14,7 +13,6 @@
   },
   "dependencies": {
     "ava": "0.16.0",
-    "babel-cli": "6.14.0",
     "babel-eslint": "6.1.2",
     "babel-plugin-transform-flow-strip-types": "6.14.0",
     "babel-register": "6.14.0",
@@ -24,7 +22,6 @@
     "eslint-plugin-import": "1.15.0",
     "eslint-plugin-jsx-a11y": "2.2.2",
     "eslint-plugin-react": "6.2.2",
-    "flow-bin": "0.32.0",
-    "jsdom": "9.5.0"
+    "flow-bin": "0.32.0"
   }
 }
