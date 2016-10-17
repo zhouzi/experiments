@@ -91,7 +91,131 @@ test('it should randomly place food', (assert) => {
   assert.fail('10 calls produced the same result');
 });
 
-test.todo('it should not place food over the snake');
-test.todo('it should grow the snake when eating food');
-test.todo('it should place food somewhere else when eaten');
-test.todo('it should move a big snake');
+test('it should grow the snake when eating food', (assert) => {
+  const game = createGame();
+  game.food = [1, 0];
+  const actual = tick(game).snake;
+  const expected = [
+    [0, 0],
+    [1, 0],
+  ];
+  assert.deepEqual(actual, expected);
+});
+
+test('it should spawn some food elsewhere when eating one', (assert) => {
+  const game = createGame();
+  const food = [1, 0];
+  game.food = food;
+  const actual = tick(game).food;
+  assert.notDeepEqual(actual, food);
+});
+
+test('it should move a bigger snake', (assert) => {
+  const game = createGame();
+  game.snake = [
+    [0, 0],
+    [1, 0],
+  ];
+  const actual = tick(game).snake;
+  const expected = [
+    [1, 0],
+    [2, 0],
+  ];
+  assert.deepEqual(actual, expected);
+});
+
+test('it should move some even bigger snake', (assert) => {
+  const game = createGame();
+  game.snake = [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [3, 0],
+  ];
+  game.direction = 'bottom';
+  game.food = [9, 9];// prevent accidentaly eating food
+  const actual = tick(game).snake;
+  const expected = [
+    [1, 0],
+    [2, 0],
+    [3, 0],
+    [3, 1],
+  ];
+  assert.deepEqual(actual, expected);
+});
+
+test('it should grow a big snake when eating food', (assert) => {
+  const game = createGame();
+  game.snake = [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [3, 0],
+  ];
+  game.direction = 'bottom';
+  game.food = [3, 1];
+  const actual = tick(game).snake;
+  const expected = [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [3, 0],
+    [3, 1],
+  ];
+  assert.deepEqual(actual, expected);
+});
+
+test('it should not place food over the snake', (assert) => {
+  for (let i = 0; i < 100; i += 1) {
+    const game = createGame();
+    game.snake = [
+      [0, 0],
+      [1, 0],
+      [2, 0],
+      [3, 0],
+      [4, 0],
+      [5, 0],
+      [6, 0],
+      [7, 0],
+      [8, 0],
+      [9, 0],
+      [9, 1],
+      [8, 1],
+      [7, 1],
+      [6, 1],
+      [5, 1],
+      [4, 1],
+      [3, 1],
+      [2, 1],
+      [1, 1],
+      [0, 1],
+    ];
+    game.food = [0, 2];
+    game.direction = 'bottom';
+    const actual = tick(game).food;
+    const y = actual[1];
+    assert.not(y, 0);
+    assert.not(y, 1);
+    assert.notDeepEqual(actual.food, [0, 2]);
+  }
+});
+
+test('it should have a default status of "playing"', (assert) => {
+  const actual = createGame().status;
+  const expected = 'playing';
+  assert.is(actual, expected);
+});
+
+test('it should update the status to gameover when the snake eats itself', (assert) => {
+  const game = createGame();
+  game.snake = [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [2, 1],
+  ];
+  game.direction = 'top';
+  const actual = tick(game).status;
+  const expected = 'gameover';
+  assert.is(actual, expected);
+});
