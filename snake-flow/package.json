@@ -5,7 +5,8 @@
     "lint": "eslint '**/*.js'",
     "test": "ava src/__test__/*.js",
     "test:watch": "ava src/__test__/*.js --watch",
-    "check": "npm run types ; npm run lint ; npm run test"
+    "check": "npm run types ; npm run lint ; npm run test",
+    "build": "webpack"
   },
   "ava": {
     "require": "babel-register",
@@ -19,5 +20,9 @@
     "eslint": "3.8.0",
     "eslint-config-airbnb-base": "8.0.0",
     "flow-bin": "0.32.0"
+  },
+  "devDependencies": {
+    "babel-loader": "6.2.5",
+    "webpack": "1.13.2"
   }
 }
