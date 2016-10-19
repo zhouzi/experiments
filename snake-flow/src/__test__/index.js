@@ -24,7 +24,7 @@ test('it should have a default direction of "right"', (assert) => {
 });
 
 test('it should set direction to bottom', (assert) => {
-  const actual = direction(createGame(), 'bottom').direction;
+  const actual = tick(direction(createGame(), 'bottom')).direction;
   const expected = 'bottom';
   assert.is(actual, expected);
 });
@@ -60,7 +60,9 @@ test('it should not move the snake out of the bounds on the y axis', (assert) =>
 });
 
 test('it should not move the snake out of the bounds on the x axis', (assert) => {
-  const actual = tick(direction(createGame(), 'left')).snake;
+  const game = createGame();
+  game.direction = 'left';
+  const actual = tick(game).snake;
   const expected = [
     [9, 0],
   ];
@@ -217,5 +219,17 @@ test('it should update the status to gameover when the snake eats itself', (asse
   game.direction = 'top';
   const actual = tick(game).status;
   const expected = 'gameover';
+  assert.is(actual, expected);
+});
+
+test('it should not be able to make half turns', (assert) => {
+  const actual = direction(createGame(), 'left').direction;
+  const expected = 'right';
+  assert.is(actual, expected);
+});
+
+test('it should not be able to make half turns via cheating move', (assert) => {
+  const actual = tick(direction(direction(createGame(), 'bottom'), 'left')).direction;
+  const expected = 'bottom';
   assert.is(actual, expected);
 });

@@ -22,7 +22,7 @@ function clear(canvas) {
   return canvas;
 }
 
-function drawRect(canvas, [x, y]) {
+function drawRect(canvas, [x, y], color) {
   const context = canvas.getContext('2d');
   context.beginPath();
 
@@ -33,15 +33,40 @@ function drawRect(canvas, [x, y]) {
     SCALE_RATIO
   );
 
-  context.fillStyle = '#000';
+  context.fillStyle = color;
   context.fill();
   context.closePath();
 }
 
 function draw(canvas, game) {
   clear(canvas);
-  game.snake.forEach(point => drawRect(clear(canvas), point));
+
+  game.snake.forEach(point => drawRect(canvas, point, 'black'));
+  drawRect(canvas, game.food, 'red');
+
   return canvas;
+}
+
+function loop(callback, interval) {
+  let lastCallTime = 0;
+  let lastPaintInterval = 0;
+
+  (function fn() {
+    const now = Date.now();
+    lastPaintInterval += now - lastCallTime;
+    lastCallTime = now;
+
+    if (lastPaintInterval >= interval) {
+      const shouldContinue = callback();
+      lastPaintInterval = 0;
+
+      if (shouldContinue === false) {
+        return;
+      }
+    }
+
+    window.requestAnimationFrame(fn);
+  }());
 }
 
 module.exports.startGame = function startGame() {
@@ -49,38 +74,29 @@ module.exports.startGame = function startGame() {
   const canvas = createCanvas(game);
 
   window.document.body.appendChild(canvas);
+
+  const [TOP, RIGHT, BOTTOM, LEFT] = [38, 39, 40, 37];
+  const directions = {
+    [TOP]: 'top',
+    [RIGHT]: 'right',
+    [BOTTOM]: 'bottom',
+    [LEFT]: 'left',
+  };
   window.addEventListener('keydown', (event) => {
-    if (event.keyCode === 38) {
-      game = direction(game, 'top');
-    }
-
-    if (event.keyCode === 39) {
-      game = direction(game, 'right');
-    }
-
-    if (event.keyCode === 40) {
-      game = direction(game, 'bottom');
-    }
-
-    if (event.keyCode === 37) {
-      game = direction(game, 'left');
+    const dir = directions[event.keyCode];
+    if (dir) {
+      event.preventDefault();
+      game = direction(game, dir);
     }
   });
 
-  let last = 0;
-  let diff = 0;
-
-  (function loop() {
-    const now = Date.now();
-    diff += (now - last) / 1000;
-    last = now;
-
-    if (diff >= 1) {
-      draw(canvas, game);
-      game = tick(game);
-      diff = 0;
+  loop(() => {
+    game = tick(game);
+    if (game.status === 'gameover') {
+      return false;
     }
 
-    window.requestAnimationFrame(loop);
-  }());
+    draw(canvas, game);
+    return true;
+  }, 200);
 };

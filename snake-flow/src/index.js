@@ -8,6 +8,7 @@ type Game = {
   food: Point,
   bounds: Point,
   direction: Direction,
+  pendingDirection: Direction | null,
   snake: Coords,
 };
 
@@ -52,17 +53,18 @@ function spawnFood(game: Game): Game {
   });
 }
 
-module.exports.createGame = function createGame(): Game {
+function createGame(): Game {
   return spawnFood({
     status: 'playing',
     food: [0, 0],
     bounds: [9, 9],
     direction: 'right',
+    pendingDirection: null,
     snake: [
       [0, 0],
     ],
   });
-};
+}
 
 function applyOrientedMove(dir: Direction): Function {
   return (pos: number, map: Object): number => (
@@ -84,20 +86,34 @@ function withinBounds(pos: number, min: number, max: number): number {
   return pos;
 }
 
-function applyMove(game: Game): Coords {
-  const snakeHead = game.snake[game.snake.length - 1];
+function applyDirection(game: Game): Game {
+  if (game.pendingDirection) {
+    return updateGame(game, {
+      direction: game.pendingDirection,
+      pendingDirection: null,
+    });
+  }
+
+  return game;
+}
+
+function applyMove(game: Game): Game {
+  const updatedGame = applyDirection(game);
+  const snakeHead = updatedGame.snake[updatedGame.snake.length - 1];
   const [x, y] = snakeHead;
-  const orientedMove = applyOrientedMove(game.direction);
-  const [minX, maxX] = [0, game.bounds[0]];
-  const [minY, maxY] = [0, game.bounds[1]];
+  const orientedMove = applyOrientedMove(updatedGame.direction);
+  const [minX, maxX] = [0, updatedGame.bounds[0]];
+  const [minY, maxY] = [0, updatedGame.bounds[1]];
   const newSnakeHead = [
     withinBounds(orientedMove(x, { right: 1, left: -1 }), minX, maxX),
     withinBounds(orientedMove(y, { top: -1, bottom: 1 }), minY, maxY),
   ];
 
-  return game.snake.slice(1).concat([
-    newSnakeHead,
-  ]);
+  return updateGame(updatedGame, {
+    snake: game.snake.slice(1).concat([
+      newSnakeHead,
+    ]),
+  });
 }
 
 function findPoint(coords: Coords, point: Point): number {
@@ -114,12 +130,13 @@ function hasDuplicates(snake: Coords): boolean {
   return snake.some((point, index) => findPoint(snake, point) !== index);
 }
 
-module.exports.tick = function tick(game: Game): Game {
-  const snake = applyMove(game);
+function tick(game: Game): Game {
+  const updatedGame = applyMove(game);
+  const snake = updatedGame.snake;
   const snakeHead = snake[snake.length - 1];
 
-  if (arePointsEqual(snakeHead, game.food)) {
-    return spawnFood(updateGame(game, {
+  if (arePointsEqual(snakeHead, updatedGame.food)) {
+    return spawnFood(updateGame(updatedGame, {
       snake: [
         [0, 0],
       ].concat(snake),
@@ -127,19 +144,41 @@ module.exports.tick = function tick(game: Game): Game {
   }
 
   if (hasDuplicates(snake)) {
-    return updateGame(game, {
+    return updateGame(updatedGame, {
       status: 'gameover',
       snake,
     });
   }
 
-  return updateGame(game, {
+  return updateGame(updatedGame, {
     snake,
   });
-};
+}
 
-module.exports.direction = function direction(game: Game, dir: Direction): Game {
+function willHalfTurn(game: Game, dir: Direction): boolean {
+  if ((game.direction === 'right' || game.direction === 'left') && (dir === 'right' || dir === 'left')) {
+    return true;
+  }
+
+  if ((game.direction === 'top' || game.direction === 'bottom') && (dir === 'top' || dir === 'bottom')) {
+    return true;
+  }
+
+  return false;
+}
+
+function direction(game: Game, dir: Direction): Game {
+  if (willHalfTurn(game, dir)) {
+    return game;
+  }
+
   return updateGame(game, {
-    direction: dir,
+    pendingDirection: dir,
   });
+}
+
+module.exports = {
+  createGame,
+  tick,
+  direction,
 };
