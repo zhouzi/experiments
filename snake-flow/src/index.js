@@ -1,166 +1,182 @@
 // @flow
 
 type Point = [number, number];
-type Coords = Point[];
+type Snake = Point[];
 type Direction = 'top' | 'right' | 'bottom' | 'left';
 type Game = {
-  status: string,
-  food: Point,
-  bounds: Point,
+  snake: Snake,
   direction: Direction,
-  pendingDirection: Direction | null,
-  snake: Coords,
+  nextDirection: Direction | null,
+  bounds: Point,
+  food: Point | null,
+  shouldGrow: boolean,
 };
 
 function updateGame(game: Game, props: Object): Game {
   return Object.assign({}, game, props);
 }
 
-function random(min: number, max: number): number {
-  return Math.floor(Math.random() * ((max - min) + 1)) + min;
-}
+function isSamePoint([x1, y1]: Point, p2: Point | null): boolean {
+  if (p2 == null) {
+    return false;
+  }
 
-function arePointsEqual(p1: Point, p2: Point): boolean {
-  const [x1, y1] = p1;
   const [x2, y2] = p2;
   return x1 === x2 && y1 === y2;
 }
 
-function notSnake(snake: Coords, point: Point): boolean {
-  return !snake.some(snakePoint => arePointsEqual(point, snakePoint));
+function isFree(game: Game, point: Point): boolean {
+  if (game.snake.some(snakePoint => isSamePoint(snakePoint, point))) {
+    return false;
+  }
+
+  if (isSamePoint(point, game.food)) {
+    return false;
+  }
+
+  return true;
 }
 
-function getFreePoints(game: Game): Coords {
-  const result = [];
-  for (let x = 0; x <= game.bounds[0]; x += 1) {
-    for (let y = 0; y <= game.bounds[1]; y += 1) {
+function getFreePointsIn(game: Game): Point[] {
+  const [width, height] = game.bounds;
+  const freePoints = [];
+
+  for (let x = 0; x < width; x += 1) {
+    for (let y = 0; y < height; y += 1) {
       const point = [x, y];
-      if (notSnake(game.snake, point)) {
-        result.push([x, y]);
+      if (isFree(game, point)) {
+        freePoints.push(point);
       }
     }
   }
 
-  return result;
+  return freePoints;
+}
+
+function random(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function getRandomFreePointIn(game: Game): Point {
+  const freePoints = getFreePointsIn(game);
+  const randomIndex = random(0, freePoints.length);
+  return freePoints[randomIndex];
 }
 
 function spawnFood(game: Game): Game {
-  const freePoints = getFreePoints(game);
-  const randomIndex = random(0, freePoints.length - 1);
-  const randomFreePoint = freePoints[randomIndex];
+  if (game.food) {
+    return game;
+  }
+
   return updateGame(game, {
-    food: randomFreePoint,
+    food: getRandomFreePointIn(game),
   });
 }
 
 function createGame(): Game {
   return spawnFood({
-    status: 'playing',
-    food: [0, 0],
-    bounds: [9, 9],
-    direction: 'right',
-    pendingDirection: null,
     snake: [
       [0, 0],
     ],
+    direction: 'right',
+    nextDirection: null,
+    bounds: [10, 10],
+    food: null,
+    shouldGrow: false,
   });
 }
 
-function applyOrientedMove(dir: Direction): Function {
-  return (pos: number, map: Object): number => (
-    map[dir]
-      ? pos + map[dir]
-      : pos
-  );
+function getSnakeHead(snake: Snake): Point {
+  return snake[snake.length - 1];
 }
 
-function withinBounds(pos: number, min: number, max: number): number {
-  if (pos < min) {
+function inRange(n: number, min: number, max: number): number {
+  if (n > max) {
+    return 0;
+  }
+
+  if (n < min) {
     return max;
   }
 
-  if (pos > max) {
-    return min;
-  }
-
-  return pos;
+  return n;
 }
 
-function applyDirection(game: Game): Game {
-  if (game.pendingDirection) {
-    return updateGame(game, {
-      direction: game.pendingDirection,
-      pendingDirection: null,
-    });
-  }
-
-  return game;
-}
-
-function applyMove(game: Game): Game {
-  const updatedGame = applyDirection(game);
-  const snakeHead = updatedGame.snake[updatedGame.snake.length - 1];
-  const [x, y] = snakeHead;
-  const orientedMove = applyOrientedMove(updatedGame.direction);
-  const [minX, maxX] = [0, updatedGame.bounds[0]];
-  const [minY, maxY] = [0, updatedGame.bounds[1]];
-  const newSnakeHead = [
-    withinBounds(orientedMove(x, { right: 1, left: -1 }), minX, maxX),
-    withinBounds(orientedMove(y, { top: -1, bottom: 1 }), minY, maxY),
+function withinBounds([x, y]: Point, [width, height]: Point): Point {
+  return [
+    inRange(x, 0, width - 1),
+    inRange(y, 0, height - 1),
   ];
-
-  return updateGame(updatedGame, {
-    snake: game.snake.slice(1).concat([
-      newSnakeHead,
-    ]),
-  });
 }
 
-function findPoint(coords: Coords, point: Point): number {
-  for (let i = 0; i < coords.length; i += 1) {
-    if (arePointsEqual(point, coords[i])) {
-      return i;
-    }
-  }
+function moveSnake(game: Game): Game {
+  const directionIncrements = {
+    top: {
+      x: 0,
+      y: -1,
+    },
+    right: {
+      x: 1,
+      y: 0,
+    },
+    bottom: {
+      x: 0,
+      y: 1,
+    },
+    left: {
+      x: -1,
+      y: 0,
+    },
+  };
+  const increments = directionIncrements[game.direction];
+  const [x, y] = getSnakeHead(game.snake);
+  const snake = game.snake.concat([
+    withinBounds([
+      x + increments.x,
+      y + increments.y,
+    ], game.bounds),
+  ]).slice(game.shouldGrow ? 0 : 1);
 
-  return -1;
-}
-
-function hasDuplicates(snake: Coords): boolean {
-  return snake.some((point, index) => findPoint(snake, point) !== index);
-}
-
-function tick(game: Game): Game {
-  const updatedGame = applyMove(game);
-  const snake = updatedGame.snake;
-  const snakeHead = snake[snake.length - 1];
-
-  if (arePointsEqual(snakeHead, updatedGame.food)) {
-    return spawnFood(updateGame(updatedGame, {
-      snake: [
-        [0, 0],
-      ].concat(snake),
-    }));
-  }
-
-  if (hasDuplicates(snake)) {
-    return updateGame(updatedGame, {
-      status: 'gameover',
-      snake,
-    });
-  }
-
-  return updateGame(updatedGame, {
+  return updateGame(game, {
     snake,
   });
 }
 
-function willHalfTurn(game: Game, dir: Direction): boolean {
-  if ((game.direction === 'right' || game.direction === 'left') && (dir === 'right' || dir === 'left')) {
+function grow(game: Game): Game {
+  const snakeHead = getSnakeHead(game.snake);
+  const shouldGrow = isSamePoint(snakeHead, game.food);
+
+  return updateGame(game, {
+    shouldGrow,
+    food: shouldGrow ? null : game.food,
+  });
+}
+
+function updateDirection(game: Game): Game {
+  return updateGame(game, {
+    direction: game.nextDirection || game.direction,
+    nextDirection: null,
+  });
+}
+
+function tick(game: Game): Game {
+  return spawnFood(grow(moveSnake(updateDirection(game))));
+}
+
+function isHalfTurn(currentDir: Direction, nextDir: Direction): boolean {
+  if (currentDir === 'right' && nextDir === 'left') {
     return true;
   }
 
-  if ((game.direction === 'top' || game.direction === 'bottom') && (dir === 'top' || dir === 'bottom')) {
+  if (currentDir === 'left' && nextDir === 'right') {
+    return true;
+  }
+
+  if (currentDir === 'top' && nextDir === 'bottom') {
+    return true;
+  }
+
+  if (currentDir === 'bottom' && nextDir === 'top') {
     return true;
   }
 
@@ -168,12 +184,12 @@ function willHalfTurn(game: Game, dir: Direction): boolean {
 }
 
 function direction(game: Game, dir: Direction): Game {
-  if (willHalfTurn(game, dir)) {
+  if (isHalfTurn(game.direction, dir)) {
     return game;
   }
 
   return updateGame(game, {
-    pendingDirection: dir,
+    nextDirection: dir,
   });
 }
 
