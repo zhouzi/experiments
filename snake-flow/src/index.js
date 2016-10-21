@@ -10,9 +10,14 @@ type Game = {
   bounds: Point,
   food: Point | null,
   shouldGrow: boolean,
+  status: 'playing' | 'gameover',
 };
 
 function updateGame(game: Game, props: Object): Game {
+  if (game.status === 'gameover') {
+    return game;
+  }
+
   return Object.assign({}, game, props);
 }
 
@@ -73,16 +78,17 @@ function spawnFood(game: Game): Game {
   });
 }
 
-function createGame(): Game {
+function createGame(bounds: Point = [10, 10]): Game {
   return spawnFood({
     snake: [
       [0, 0],
     ],
     direction: 'right',
     nextDirection: null,
-    bounds: [10, 10],
+    bounds,
     food: null,
     shouldGrow: false,
+    status: 'playing',
   });
 }
 
@@ -107,6 +113,20 @@ function withinBounds([x, y]: Point, [width, height]: Point): Point {
     inRange(x, 0, width - 1),
     inRange(y, 0, height - 1),
   ];
+}
+
+function indexOfPoint(snake: Snake, point: Point): number {
+  for (let i = 0; i < snake.length; i += 1) {
+    if (isSamePoint(snake[i], point)) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+function hasDuplicates(snake: Snake): boolean {
+  return snake.some((point, index) => indexOfPoint(snake, point) !== index);
 }
 
 function moveSnake(game: Game): Game {
@@ -136,6 +156,12 @@ function moveSnake(game: Game): Game {
       y + increments.y,
     ], game.bounds),
   ]).slice(game.shouldGrow ? 0 : 1);
+
+  if (hasDuplicates(snake)) {
+    return updateGame(game, {
+      status: 'gameover',
+    });
+  }
 
   return updateGame(game, {
     snake,

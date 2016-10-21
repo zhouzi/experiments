@@ -7,8 +7,8 @@ const SCALE_RATIO = 10;
 function createCanvas(game) {
   const canvas = window.document.createElement('canvas');
   const [width, height] = game.bounds;
-  const canvasWidth = (width + 1) * SCALE_RATIO;
-  const canvasHeight = (height + 1) * SCALE_RATIO;
+  const canvasWidth = (width) * SCALE_RATIO;
+  const canvasHeight = (height) * SCALE_RATIO;
 
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
@@ -70,7 +70,7 @@ function loop(callback, interval) {
 }
 
 module.exports.startGame = function startGame() {
-  let game = createGame();
+  let game = createGame([40, 40]);
   const canvas = createCanvas(game);
 
   window.document.body.appendChild(canvas);
@@ -98,5 +98,5 @@ module.exports.startGame = function startGame() {
 
     draw(canvas, game);
     return true;
-  }, 200);
+  }, 50);
 };

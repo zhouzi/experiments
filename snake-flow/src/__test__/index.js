@@ -128,5 +128,38 @@ test('the snake should grow when eating food', (assert) => {
   assert.deepEqual(actual, expected);
 });
 
-test.todo('it should have a default status of "playing"');
-test.todo('it should update the status to gameover when the snake eats itself');
+test('it should have a default status of "playing"', (assert) => {
+  const actual = createGame().status;
+  const expected = 'playing';
+  assert.is(actual, expected);
+});
+
+test('it should update the status to gameover when the snake eats itself', (assert) => {
+  const game = createGame();
+  game.snake = [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [2, 1],
+    [1, 1],
+  ];
+  game.direction = 'top';
+  const actual = tick(game).status;
+  const expected = 'gameover';
+  assert.is(actual, expected);
+});
+
+test('it should not update game when status is gameover', (assert) => {
+  const game = createGame();
+  game.status = 'gameover';
+  const actual = tick(game);
+  const expected = game;
+  assert.is(actual, expected);
+});
+
+test('it should set custom bounds', (assert) => {
+  const bounds = [10, 10];
+  const actual = createGame(bounds).bounds;
+  const expected = bounds;
+  assert.deepEqual(actual, expected);
+});
